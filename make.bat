@@ -6,7 +6,10 @@
 :: -------------------------------------
 set RAYLIB_SRC="raylib\src"
 set RAYLIB_RES_FILE="raylib\src\raylib.rc.data"
-set COMPILER="mingw\bin\g++.exe"
+set COMPILER="TDM-GCC\bin\g++.exe"
+set MSVC="C:\Program Files (x86)\Microsoft Visual Studio\2019\Community\VC\Tools\MSVC\14.27.29110\bin\Hostx86\x86\cl.exe"
+set ORIG_PATH=%PATH%
+set TDM_LIBS="TDM-GCC\x86_64-w64-mingw32\lib"
 
 :: Get full filename path for input file %1
 set FILENAME=%~f1
@@ -26,17 +29,17 @@ cmd /c if exist %NAMEPART%.exe del /F %NAMEPART%.exe
 :: -std=c99  : Use C99 language standard
 :: -Wall     : Enable all compilation Warnings
 :: -mwindows : Compile a Windows executable, no cmd window
-%COMPILER% %FILENAME% %RAYLIB_RES_FILE% -o %NAMEPART%.x86.exe -s -Os -I%RAYLIB_SRC% -L%RAYLIB_SRC% -lraylib -lopengl32 -lgdi32 -lwinmm -std=c++17 -Wall -mwindows -m32 -static
-::%COMPILER% %FILENAME% %RAYLIB_RES_FILE% -o %NAMEPART%.x64.exe -s -Os -I%RAYLIB_SRC% -L%RAYLIB_SRC% -lraylib -lopengl32 -lgdi32 -lwinmm -std=c++17 -Wall -mwindows -m64 -static
+%COMPILER% %FILENAME% %RAYLIB_RES_FILE% -o %NAMEPART%.x86.exe -s -Os -I%RAYLIB_SRC% -L%RAYLIB_SRC% -Lextra-dlls -lraylib -lopengl32 -lgdi32 -lwinmm -std=c++17 -Wall -mwindows -m32 -static
 
 :: Max optimize with upx
 upx\upx.exe --ultra-brute -9 --best -v -f --compress-icons=1 --compress-resources=1 --strip-relocs=1 --compress-exports=1 %NAMEPART%.x86.exe
-::upx\upx.exe --ultra-brute -9 --best -v -f --compress-icons=1 --compress-resources=1 --strip-relocs=1 --compress-exports=1 %NAMEPART%.x64.exe
+
 
 :: Ensure dirs for built exes
 mkdir bin\x86
-::mkdir bin\x64
 
 :: Move builds to respective binary directories
 move %NAMEPART%.x86.exe bin\x86
-::move %NAMEPART%.x64.exe bin\x64
+
+:: Clean up
+set PATH=%ORIG_PATH%
